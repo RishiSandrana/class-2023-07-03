@@ -4,8 +4,95 @@ format: html
 editor: visual
 ---
 
+What is the difference in pulse rate between two randomly selected female students in this class?
+
+## Wisdom
+Predictive Model
+
+Units: Female Students in this Class
+
+Covariates: None
+
+Treatment: None
+
+Outcome: Pulse Rate
+
+Validity: The pulse rate could be calculated differently in the nhanes data and the classroom depending on the device used to measure pulse rate. Everyone's pulse rate could be high in the classroom because of nervousness whereas the people in the nhanes data set would be calmer.
+
+## Justice
+Stability means that the relationship between the columns in the Population Table is the same for three categories of rows: the data, the Preceptor Table, and the larger population from which both are drawn.
+Stability: Higher sugar content in peoples' diets today could lead to a higher pulse rate in our class compared to people in the nhanes dataset. (Social media and COVID also have an effect)
+
+Representativeness or the lack thereof, is the relationship, among the rows in the Population Table, between our data and the other rows. Ideally, we would like our data to be a random sample from the population. Sadly, this is almost never the case.
+Representativeness: nhanes data is only for the United States but we have students from numerous places in the world.
+
+Unconfoundedness: Not applicable because we are not using a causal model (no treatment).
+
+Formula: 
+
 ```{r}
+#| echo: false
+#| message: false
+#| warning: false
 library(tidyverse)
 library(primer.data)
+library(rstanarm)
 ```
 
+```{r}
+#| echo: false
+x <- nhanes |>
+  select(gender, pulse) |>
+  filter(gender == "Female") |>
+  drop_na()
+
+fit_obj <- stan_glm(
+  data = x,
+  family = gaussian(),
+  refresh = 0,
+  formula = pulse ~ 1,
+  seed = 9
+)
+```
+
+```{r}
+#| echo: false
+fit_obj |> 
+  as_tibble() |>
+  ggplot(aes(x = `(Intercept)`)) + 
+  geom_histogram(
+    aes(y = after_stat(count/sum(count))),
+    bins = 50,
+    color = "white"
+  ) +
+  labs(
+    title = "Posterior for Average Female Pulse Rate",
+    x = expression(mu),
+    y = "Probability"
+  ) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  theme_classic()
+```
+```{r}
+#| echo: false
+newobs <- tibble(.rows = 2)
+pp <- posterior_predict(object = fit_obj, newdata = newobs) |>
+  as_tibble() |>
+  rowwise() |>
+  mutate(diff = abs(`2` - `1`))
+
+pp |>
+  ggplot(aes(x = diff)) + 
+  geom_histogram(
+    aes(y = after_stat(count/sum(count))),
+    bins = 50,
+    color = "white"
+  ) +
+  labs(
+    title = "Posterior for Pulse Rate Difference Among Two Random Females",
+    x = "Pulse Difference",
+    y = "Probability"
+  ) + 
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  theme_classic()
+```
