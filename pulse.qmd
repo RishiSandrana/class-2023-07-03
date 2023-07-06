@@ -21,7 +21,6 @@ Outcome: Pulse Rate
 
 Validity: The pulse rate could be calculated differently in the nhanes data and the classroom depending on the device used to measure pulse rate. Everyone's pulse rate in the classroom could be comparatively higher due to nervousness as opposed to people in the nhanes data set who may be calmer.
 
-
 ## Justice
 
 Stability: A higher sugar content in peoples' diets today may imply that our class has a higher average pulse rate compared to people in 2012. (Social media and COVID also have an effect on stability.)
@@ -30,7 +29,7 @@ Representativeness: nhanes data is only for the United States but we have studen
 
 Unconfoundedness: Not applicable because we are not using a causal model (no treatment).
 
-Formula: pulse ~ 1
+Formula: pulse \~ 1
 
 ```{r}
 #| echo: false
@@ -77,6 +76,7 @@ fit_obj |>
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
   theme_classic()
 ```
+
 ## Temperance
 
 ```{r}
@@ -102,3 +102,13 @@ pp |>
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
   theme_classic()
 ```
+
+```{r}
+#| echo: false
+#| message: false
+median <- median(pp$diff)
+```
+
+## Conclusion
+
+The difference in pulse rate between two randomly selected female students is `r median`.
