@@ -29,7 +29,7 @@ Representativeness: nhanes data is only for the United States but we have studen
 
 Unconfoundedness: Not applicable because we are not using a causal model (no treatment).
 
-Formula: pulse \~ 1
+Formula: pulse ~ 1
 
 ```{r}
 #| echo: false
